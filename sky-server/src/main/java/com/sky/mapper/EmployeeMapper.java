@@ -38,5 +38,13 @@ public interface EmployeeMapper {
      * 启用禁用员工账号
      * @param employee
      */
-    void startOrStop(Employee employee);
+    void update(Employee employee);
+
+    /**
+     * 使用id进行查询
+     * @param id
+     * @return
+     */
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }

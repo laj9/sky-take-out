@@ -11,7 +11,7 @@
         </where>
         order by create_time DESC
     </select>
-    <update id="startOrStop">
+    <update id="update">
         update employee
         <set>
             <if test="name != null">name = #{name},</if>
