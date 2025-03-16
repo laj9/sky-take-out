@@ -76,11 +76,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employeeDTO,employee);
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
         //共享同一线程可以进行值传递，在jwt校验时保存已解析的id，在这里设置
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
     }
@@ -136,8 +136,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
 
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }
