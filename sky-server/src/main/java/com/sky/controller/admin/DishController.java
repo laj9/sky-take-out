@@ -1,16 +1,16 @@
 package com.sky.controller.admin;
 
+import com.github.pagehelper.Page;
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * ClassName: DishController
@@ -29,16 +29,30 @@ public class DishController {
 
     @Autowired
     DishService dishService;
+
     /**
      * 添加菜品
+     *
      * @param dishDTO
      * @return
      */
     @PostMapping
     @ApiOperation("添加菜品")
-    public Result save(@RequestBody DishDTO dishDTO){
-        log.info("开始进行菜品管理：{}",dishDTO);
+    public Result save(@RequestBody DishDTO dishDTO) {
+        log.info("开始进行菜品管理：{}", dishDTO);
         dishService.savewithFlavor(dishDTO);
         return Result.success();
+    }
+
+    /**
+     * @param dishPageQueryDTO
+     * @return 不需要加RequestBody因为是直接请求用？，而不是使用json格式
+     */
+    @GetMapping("/page")
+    @ApiOperation("分页查询")
+    public Result<PageResult> pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+        log.info("开始分页查询：{}", dishPageQueryDTO);
+        PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
+        return Result.success(pageResult);
     }
 }
