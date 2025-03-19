@@ -5,6 +5,8 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 /**
  * ClassName: DishService
  * Package: com.sky.service
@@ -28,4 +30,10 @@ public interface DishService {
      * @return
      */
     PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+    /**
+     * 删除菜品
+     * @param ids
+     */
+    void deleteById(List<Long> ids);
 }
