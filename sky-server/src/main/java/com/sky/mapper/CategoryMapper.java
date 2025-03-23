@@ -60,5 +60,5 @@ public interface CategoryMapper {
      * @param type
      * @return
      */
-    List<Category> getByType(int type);
+    List<Category> getByType(Integer type);
 }

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -150,5 +151,22 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<DishVO> dishVOS = new ArrayList<>();
+        List<Dish> dishList = dishMapper.list(dish);
+
+        for(Dish d:dishList){
+            //将dish中的属性拷贝给dishVO
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+            //获取flavour list
+            List<DishFlavor> flavorList = dishFlavorMapper.getById(d.getId());
+            dishVO.setFlavors(flavorList);
+            //将其添加入list
+            dishVOS.add(dishVO);
+        }
+        return dishVOS;
     }
 }
