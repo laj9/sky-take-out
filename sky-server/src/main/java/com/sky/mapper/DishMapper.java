@@ -47,6 +47,7 @@ public interface DishMapper {
      * @param id
      * @return
      */
+    @Select("select * from dish where id = #{id}")
     Dish getBydish(Long id);
 
     /**
