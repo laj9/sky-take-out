@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * ClassName: OrderMapper
  * Package: com.sky.mapper
@@ -66,4 +69,12 @@ public interface OrderMapper {
      */
     @Select("select count(id) from orders where status = #{status}")
     Integer statistics(Integer status);
+
+    /**
+     * 根据状态和时间选择订单
+     * @param status
+     * @param time
+     */
+    @Select("select * from orders where status = #{status} and order_time < #{time}")
+    List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime time);
 }
