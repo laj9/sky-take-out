@@ -267,7 +267,7 @@ public class OrderServiceImpl implements OrderService {
      */
     public PageResult pageQuery4User(int page, int pageSize, Integer status) {
         //设置分页
-        PageHelper.startPage(pageSize, page);
+        PageHelper.startPage(page, pageSize);
         //进行分页查询
         OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
         ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
@@ -516,6 +516,28 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.COMPLETED);
         orders.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    /**
+     * 用户催单
+     *
+     * @param id
+     */
+    public void reminder(Long id) {
+        Orders orderDB = orderMapper.getById(id);
+
+        //判断是否为空
+        if (orderDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        HashMap map = new HashMap();
+        map.put("type", 2);//2为用户催单
+        map.put("orderId", id);
+        map.put("content", "订单号：" + orderDB.getNumber());
+
+        String string = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(string);
     }
 
     private List<OrderVO> getOrderVOList(Page<Orders> page) {
