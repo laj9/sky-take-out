@@ -85,4 +85,11 @@ public interface OrderMapper {
      * @return
      */
     Double sumByMap(Map map);
+
+    /**
+     * 根据map获得符合条件的订单数据
+     * @param map
+     * @return
+     */
+    Integer getOrdersNumber(Map map);
 }
