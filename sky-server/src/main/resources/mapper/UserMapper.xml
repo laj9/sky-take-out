@@ -7,4 +7,19 @@
         values
         (#{openid},#{name},#{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+
+    <select id="getNewUser" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="beginTime != null"> and create_Time &gt; #{beginTime}</if>
+            <if test="endTime != null"> and create_Time &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <select id="getTotalUser" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="endTime != null"> and create_Time &lt; #{endTime}</if>
+        </where>
+    </select>
 </mapper>

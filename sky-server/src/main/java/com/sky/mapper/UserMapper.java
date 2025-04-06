@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -46,4 +47,19 @@ public interface UserMapper {
      */
     @Select("select * from user where id = #{id}")
     User getById(Long userId);
+
+    /**
+     * 新增用户数量统计
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    Integer getNewUser(LocalDateTime beginTime, LocalDateTime endTime);
+
+    /**
+     * 总用户数量统计
+     * @param endTime
+     * @return
+     */
+    Integer getTotalUser(LocalDateTime endTime);
 }
