@@ -1,13 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.service.ReportService;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
-import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
-import org.apache.commons.lang.StringUtils;
+import com.sky.vo.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ClassName: ReportServiceImpl
@@ -174,7 +174,7 @@ public class ReportServiceImpl implements ReportService {
         //不能写成Double orderCompletionRate = validOrderCount / totalOrderCount + 0.0;
         //因为相当于计算了两个int类型数据相除后（只可能是0.0或1.0）再转成double
         //所以先将其中一个直接转换成double再除
-        Double orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount ;
+        Double orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
         return OrderReportVO
                 .builder()
                 .dateList(StringUtils.join(dateList, ","))
@@ -183,6 +183,33 @@ public class ReportServiceImpl implements ReportService {
                 .validOrderCount(validOrderCount)
                 .totalOrderCount(totalOrderCount)
                 .validOrderCountList(StringUtils.join(validOrderCountList, ","))
+                .build();
+    }
+
+    /**
+     * 菜品/套餐top10统计
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+        List<String> names = salesTop10.stream()       // 1. 将 List 转换成 Stream
+                .map(GoodsSalesDTO::getName)              // 2. 提取每个对象的 name 字段
+                //GoodsSalesDTO::getName 是 方法引用，相当于 dto -> dto.getName()，即从每个 GoodsSalesDTO 对象中提取 name 字段。
+                .collect(Collectors.toList());             // 3. 收集成新的 List<String>
+        String nameList = StringUtils.join(names, ",");
+        List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        String numberList = StringUtils.join(numbers, ",");
+
+        return SalesTop10ReportVO
+                .builder()
+                .nameList(nameList)
+                .numberList(numberList)
                 .build();
     }
 }
