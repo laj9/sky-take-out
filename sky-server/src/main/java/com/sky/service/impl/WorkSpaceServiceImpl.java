@@ -45,14 +45,14 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
      *
      * @return
      */
-    public BusinessDataVO getBusinessData() {
-        LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
-        LocalDateTime beginTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+    public BusinessDataVO getBusinessData(LocalDateTime begin, LocalDateTime end) {
+//        LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+//        LocalDateTime beginTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
 
         //营业额：select sum(amount) from orders where order_time > ? and order_time < ? and status = 5
         Map map1 = new HashMap();
-        map1.put("begin", beginTime);
-        map1.put("end", endTime);
+        map1.put("begin", begin);
+        map1.put("end", end);
         map1.put("status", Orders.COMPLETED);
         Double turnover = orderMapper.sumByMap(map1);
         turnover = turnover == null ? 0.0 : turnover;
@@ -62,8 +62,8 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
 
         //总订单数: select count(id) from orders where order_time > ? and order_time < ?
         Map map2 = new HashMap();
-        map2.put("begin", beginTime);
-        map2.put("end", endTime);
+        map2.put("begin", begin);
+        map2.put("end", end);
         Integer totalOrderCount = orderMapper.getOrdersNumber(map2);
 
         //订单完成率：有效订单/总订单
@@ -73,7 +73,7 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
         Double unitPrice = turnover.doubleValue() / validOrderCount;
 
         //新增用户：select count(id) from user where create_time > ? and create_time < ?
-        Integer newUsers = userMapper.getNewUser(beginTime, endTime);
+        Integer newUsers = userMapper.getNewUser(begin, end);
 
         return BusinessDataVO
                 .builder()

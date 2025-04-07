@@ -5,6 +5,8 @@ import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
 
+import java.time.LocalDateTime;
+
 /**
  * ClassName: WorkSpaceService
  * Package: com.sky.service
@@ -17,25 +19,29 @@ import com.sky.vo.SetmealOverViewVO;
 public interface WorkSpaceService {
 
     /**
-     *工作台数据概览统计
+     * 工作台数据概览统计
+     *
      * @return
      */
-    BusinessDataVO getBusinessData();
+    BusinessDataVO getBusinessData(LocalDateTime begin, LocalDateTime end);
 
     /**
      * 订单管理数据
+     *
      * @return
      */
     OrderOverViewVO getOverviewOrders();
 
     /**
      * 菜品总览数据
+     *
      * @return
      */
     DishOverViewVO getOverviewDishes();
 
     /**
      * 套餐总览
+     *
      * @return
      */
     SetmealOverViewVO getOverviewSetmeals();

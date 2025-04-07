@@ -5,11 +5,19 @@ import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
+import com.sky.service.WorkSpaceService;
 import com.sky.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,6 +43,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkSpaceService workSpaceService;
 
     /**
      * 营业额统计
@@ -211,5 +221,75 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+    /**
+     * 导出运营数据报表
+     *
+     * @param response
+     */
+    public void exportBusinessData(HttpServletResponse response) {
+        //查询数据库，获取营业数据
+        LocalDate beginTime = LocalDate.now().minusDays(30);
+        LocalDate endTime = LocalDate.now().minusDays(1);
+        BusinessDataVO businessData = workSpaceService.getBusinessData(LocalDateTime.of(beginTime, LocalTime.MIN), LocalDateTime.of(endTime, LocalTime.MAX));
+
+        Double orderCompletionRate = businessData.getOrderCompletionRate();
+        orderCompletionRate = orderCompletionRate == null ? 0.00 : orderCompletionRate;
+
+        Double unitPrice = businessData.getUnitPrice();
+        unitPrice = unitPrice == null ? 0.00 : unitPrice;
+
+        //通过POI将数据写入文件中
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+
+        try {
+            //基于模板创建新的excel文件
+            XSSFWorkbook excel = new XSSFWorkbook(in);
+
+            XSSFSheet sheet = excel.getSheet("sheet1");
+
+            sheet.getRow(1).getCell(1).setCellValue("时间为：" + beginTime + "至" + endTime);
+
+            XSSFRow row = sheet.getRow(3);
+            row.getCell(2).setCellValue(businessData.getTurnover());
+            row.getCell(4).setCellValue(orderCompletionRate);
+            row.getCell(6).setCellValue(businessData.getNewUsers());
+
+            XSSFRow row1 = sheet.getRow(4);
+            row1.getCell(2).setCellValue(businessData.getValidOrderCount());
+            row1.getCell(4).setCellValue(unitPrice);
+
+            //明细数据填充
+            for (int i = 0; i < 30; i++) {
+                beginTime = beginTime.plusDays(1);
+                LocalDateTime begin = LocalDateTime.of(beginTime, LocalTime.MIN);
+                LocalDateTime end = LocalDateTime.of(beginTime, LocalTime.MAX);
+
+                BusinessDataVO businessData1 = workSpaceService.getBusinessData(begin, end);
+
+                Double unitPrice1 = businessData1.getUnitPrice();
+                unitPrice1 = unitPrice1 == null ? 0.00 : unitPrice;
+                Double orderCompletionRate1 = businessData1.getOrderCompletionRate();
+                orderCompletionRate1 = orderCompletionRate == null ? 0.00 : orderCompletionRate;
+
+                XSSFRow row2 = sheet.getRow(7 + i);
+                row2.getCell(1).setCellValue(beginTime.toString());
+                row2.getCell(2).setCellValue(businessData1.getTurnover());
+                row2.getCell(3).setCellValue(businessData1.getValidOrderCount());
+                row2.getCell(4).setCellValue(orderCompletionRate1);
+                row2.getCell(5).setCellValue(unitPrice1);
+                row2.getCell(6).setCellValue(businessData1.getNewUsers());
+            }
+            //通过输出流将excel文件下载到客户端浏览器
+            ServletOutputStream out = response.getOutputStream();
+            excel.write(out);
+
+            //关闭资源
+            out.close();
+            excel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
